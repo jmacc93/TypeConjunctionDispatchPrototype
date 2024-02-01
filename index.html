@@ -1,0 +1,665 @@
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>Tagged-js prototype</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+    
+    <style>
+      html {
+        color: #1a1a1a;
+        background-color: #fdfdfd;
+      }
+/*      body {
+        margin: 0 auto;
+        max-width: 36em;
+        padding-left: 50px;
+        padding-right: 50px;
+        padding-top: 50px;
+        padding-bottom: 50px;
+        hyphens: auto;
+        overflow-wrap: break-word;
+        text-rendering: optimizeLegibility;
+        font-kerning: normal;
+      }*/
+      @media (max-width: 600px) {
+        body {
+          font-size: 0.9em;
+          padding: 12px;
+        }
+        h1 {
+          font-size: 1.8em;
+        }
+      }
+      @media print {
+        html {
+          background-color: white;
+        }
+        body {
+          background-color: transparent;
+          color: black;
+          font-size: 12pt;
+        }
+        p, h2, h3 {
+          orphans: 3;
+          widows: 3;
+        }
+        h2, h3, h4 {
+          page-break-after: avoid;
+        }
+      }
+      p {
+        margin: 1em 0;
+      }
+      a {
+        color: #1a1a1a;
+      }
+      a:visited {
+        color: #1a1a1a;
+      }
+      img {
+        max-width: 100%;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        margin-top: 1.4em;
+      }
+      h5, h6 {
+        font-size: 1em;
+        font-style: italic;
+      }
+      h6 {
+        font-weight: normal;
+      }
+      ol, ul {
+        padding-left: 1.7em;
+        margin-top: 1em;
+      }
+      li > ol, li > ul {
+        margin-top: 0;
+      }
+      blockquote {
+        margin: 1em 0 1em 1.7em;
+        padding-left: 1em;
+        border-left: 2px solid #e6e6e6;
+        color: #606060;
+      }
+      code {
+        font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+        font-size: 85%;
+        margin: 0;
+        hyphens: manual;
+      }
+      pre {
+        margin: 1em 0;
+        overflow: auto;
+      }
+      pre code {
+        padding: 0;
+        overflow: visible;
+        overflow-wrap: normal;
+      }
+      .sourceCode {
+      background-color: transparent;
+      overflow: visible;
+      }
+      hr {
+        background-color: #1a1a1a;
+        border: none;
+        height: 1px;
+        margin: 1em 0;
+      }
+      header {
+        margin-bottom: 4em;
+        text-align: center;
+      }
+      #TOC li {
+        list-style: none;
+      }
+      #TOC ul {
+        padding-left: 1.3em;
+      }
+      #TOC > ul {
+        padding-left: 0;
+      }
+      #TOC a:not(:hover) {
+        text-decoration: none;
+      }
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      div.columns{display: flex; gap: min(4vw, 1.5em);}
+      div.column{flex: auto; overflow-x: auto;}
+      div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+      ul.task-list{list-style: none;}
+      ul.task-list li input[type="checkbox"] {
+        width: 0.8em;
+        margin: 0 0.8em 0.2em -1.6em;
+        vertical-align: middle;
+      }
+      .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+      /* CSS for syntax highlighting */
+      pre > code.sourceCode { white-space: pre; position: relative; }
+      pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+      pre > code.sourceCode > span:empty { height: 1.2em; }
+      .sourceCode { overflow: visible; }
+      code.sourceCode > span { color: inherit; text-decoration: inherit; }
+      div.sourceCode { margin: 1em 0; }
+      pre.sourceCode { margin: 0; }
+      @media screen {
+      div.sourceCode { overflow: auto; }
+      }
+      @media print {
+      pre > code.sourceCode { white-space: pre-wrap; }
+      pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+      }
+      pre.numberSource code
+        { counter-reset: source-line 0; }
+      pre.numberSource code > span
+        { position: relative; left: -4em; counter-increment: source-line; }
+      pre.numberSource code > span > a:first-child::before
+        { content: counter(source-line);
+          position: relative; left: -1em; text-align: right; vertical-align: baseline;
+          border: none; display: inline-block;
+          -webkit-touch-callout: none; -webkit-user-select: none;
+          -khtml-user-select: none; -moz-user-select: none;
+          -ms-user-select: none; user-select: none;
+          padding: 0 4px; width: 4em;
+          color: #aaaaaa;
+        }
+      pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+      div.sourceCode
+        {   }
+      @media screen {
+      pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+      }
+      code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+      code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+      code span.at { color: #7d9029; } /* Attribute */
+      code span.bn { color: #40a070; } /* BaseN */
+      code span.bu { color: #008000; } /* BuiltIn */
+      code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+      code span.ch { color: #4070a0; } /* Char */
+      code span.cn { color: #880000; } /* Constant */
+      code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+      code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+      code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+      code span.dt { color: #902000; } /* DataType */
+      code span.dv { color: #40a070; } /* DecVal */
+      code span.er { color: #ff0000; font-weight: bold; } /* Error */
+      code span.ex { } /* Extension */
+      code span.fl { color: #40a070; } /* Float */
+      code span.fu { color: #06287e; } /* Function */
+      code span.im { color: #008000; font-weight: bold; } /* Import */
+      code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+      code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+      code span.op { color: #666666; } /* Operator */
+      code span.ot { color: #007020; } /* Other */
+      code span.pp { color: #bc7a00; } /* Preprocessor */
+      code span.sc { color: #4070a0; } /* SpecialChar */
+      code span.ss { color: #bb6688; } /* SpecialString */
+      code span.st { color: #4070a0; } /* String */
+      code span.va { color: #19177c; } /* Variable */
+      code span.vs { color: #4070a0; } /* VerbatimString */
+      code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    </style>
+    
+    <style>
+      div.CodeMirror {
+        width: 30vw;
+        height: 60em;
+        border: 2px solid rgba(0, 0, 255, 50%);
+        border-radius: 6px; 
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 60%);
+        background: rgba(0, 0, 255, 1%);
+      }
+      
+      table.editor-area {
+        width: 95%;
+      }
+      
+      .centered-text {
+        width: 60vw;
+        margin: 0 auto;
+      }
+      
+      p > code {
+        background: rgba(0, 0, 255, 4%);
+        border: 1px solid rgba(0, 0, 255, 7%);
+        border-radius: 4px;
+      }
+      
+      .math {
+        background: rgba(255, 0, 0, 4%);
+        border: 1px solid rgba(255, 0, 0, 7%);
+        border-radius: 4px;
+      }
+      
+      .sourceCode {
+        background: rgba(0, 0, 255, 1%);
+        border-radius: 2px;
+        border: 1px solid rgba(0, 0, 255, 7%);
+      }
+      .sourceCode > * {
+        border: none;
+      }
+      
+      body {
+        color: rgb(40, 40, 40);
+        font-size: 1.3em
+      }
+
+      h1 {
+        color: rgb(80, 80, 80)
+      }
+      
+      .center-divider {
+        height: 0px;
+        font-size: 16px;
+        margin: 0 auto;
+        width: 10%;
+        color: rgba(0, 0, 0, 15%);
+      }
+      
+      em.highlighted {
+        background: rgba(255, 255, 128, 30%)
+      }
+    </style>
+    
+    
+    <script type="module">
+      import {
+        replaceAllGuardForms, replaceAllFunctionForms,
+        makeGuardedIfElseStatementsString, addGuardBranchFunctions,
+        convert, run
+      } from './tagJsConverter.mjs'
+      
+      import 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js'
+      import 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/javascript/javascript.min.js'
+      
+      const initialContent = `guard String(x) {
+  return typeof x === 'string'
+}
+guard Array(x) {
+  return typeof x === 'object' && Array.isArray(x)
+}
+guard Nonempty(x) {
+  return x.length > 0
+}
+guard Empty(x) {
+  return x.length == 0
+}
+guard Number(x) {
+  return typeof x === 'number'
+}
+guard Even(x) {
+  return x % 2 == 0
+}
+guard Odd(x) {
+  return x % 2 == 1
+}
+guard IsOne(x) {
+  return x == 1
+}
+
+// Here's a bunch of overloads of foo using conjunction types
+function foo(x: Number * Odd * IsOne) {
+  return []
+}
+function foo(x: Number * Even) {
+  return x / 2
+}
+// Notice that \`HeresATagType\` has no guard test and doesn't produce an error
+function foo(x: Number * Odd * HeresATagType) {
+  return x + 1
+}
+function foo(x: String * Empty) {
+  return "nonempty"
+}
+function foo(x: String * Nonempty) {
+  return x + '...'
+}
+function foo(x: Array * Empty) {
+  x.push("")
+  return x
+}
+function foo(x: Array * Nonempty) {
+  return x.pop()
+}
+
+// This evaluates foo repeatedly, going through each of its overloads
+let value = 10
+for(let i = 0; i < 13; i++){
+  value = foo(value)
+  print(\`step \${i}:\`, value)
+}
+
+`
+      const taggedEditorElem = document.getElementById('taggedEditorElem')
+      const taggedEditor = CodeMirror(taggedEditorElem, {
+        value: initialContent,
+        mode: "javascript",
+        lineNumber: true
+      })
+      
+      const resultEditor = CodeMirror(document.getElementById('resultEditorElem'), {
+        value: '',
+        mode: "javascript",
+        lineNumber: true,
+        readOnly: true
+      })
+      
+      let consoleValue = ''
+      const consoleEditor = CodeMirror(document.getElementById('consoleEditorElem'), {
+        value: consoleValue,
+        readOnly: true
+      })
+      
+      function consolePrintFunction(...args) {
+        for(const arg of args) {
+          if(typeof arg === 'string')
+            consoleValue += arg + ' '
+          else
+            consoleValue += JSON.stringify(arg) + ' '
+        }
+        consoleValue += '\n'
+        consoleEditor.setValue(consoleValue)
+      }
+      
+      setTimeout(updateResults, 0)
+      // update results after a delay
+      const resultUpdateDelay = 500 // milliseconds
+      let resultUpdateTimeout
+      function updateResults() {
+        resultUpdateTimeout = undefined
+        const taggedValue = taggedEditor.getValue()
+        const resultValue = convert(taggedValue)
+        resultEditor.setValue(resultValue)
+        
+        consoleValue = ''
+        const evalFn = Function('print', resultValue)
+        evalFn(consolePrintFunction)
+      }
+      taggedEditorElem.addEventListener('keydown', event => {
+        if(resultUpdateTimeout != undefined)
+          clearTimeout(resultUpdateTimeout)
+        resultUpdateTimeout = setTimeout(updateResults, resultUpdateDelay)
+      })
+    </script>
+    
+  </head>
+  
+  <body>
+    
+    
+    <div id="precode" class="centered-text">
+<h1>Dynamic dispatching via type conjunctions prototype</h1>
+<p>This is a very brittle and rough prototype transpiler to regular Javascript
+from a variant of Javascript extended with a very limited form of
+dynamic dispatching via ‘guard’ tests and type conjunctions.
+The dispatching is accomplished with function name mangling (see the
+<code>foo_...</code> functions in the middle code box) and simple
+conditional branching (see the final <code>foo</code> function at the
+bottom of the middle code box). This demo is primarily intended to demonstrate
+type conjunctions. See below the code boxes for a longer description of type conjunctions, and tag types</p>
+<p>The middle and right boxes are read only. Edit the code in the left
+box to automatically update the middle and right boxes. Its very likely the demonstration will break if you change it much, though</p>
+<p>The <code>guard TypeName(value) { ...; return someBoolean }</code> form is essentially a type definition and represents the membership test for the
+type. The form <code>Type1 * Type2 * ...</code> is a type conjunction.
+These forms can be used in function definitions’ parameter lists, for
+example: <code>function foo(x: Integer * Positive) { ... }</code></p>
+    </div>
+    
+    <table class='editor-area'>
+      <thead>
+        <tr>
+          <th><em class="highlighted">Edit this code</em></th>
+          <th>Javascript equivalent</th>
+          <th>Code output</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td id="taggedEditorElem"></td>
+          <td id="resultEditorElem"></td>
+          <td id="consoleEditorElem"></td>
+        </td>
+      </tbody>
+    </table>
+    
+    <div id="postcode" class="centered-text">
+<h1 id="conjunctive-typing">Type conjunctions</h1>
+<p>In the code above, the form <code>A * B * ...</code> is a type
+conjunction and is equivalent to both an intersection of <code>A</code>,
+<code>B</code>, etc, when the terms are sets (eg: when a type is the set
+of all values of that type); and a logical conjunction of
+<code>A</code>, <code>B</code>, etc when the terms are predicates
+(eg: when a type is a predicate that tells you when a value is a member
+of that type). For this prototype I use the logical model, and the guard tests are the defining predicates
+for the corresponding types</p>
+<p>So the (theoretical) form <code>let x: Positive * Integer</code>
+means the value <code>x</code> is a member of <em>both</em>
+<code>Positive</code> and <code>Integer</code>. Logically, that means
+both types’ defining predicates return true when given <code>x</code>,
+ie:
+<code>member(Positive * Integer, x) = member(Positive, x) &amp;&amp; member(Integer, x)</code>.
+Setwise, it means <code>x</code> is a member of the intersection of the
+two types’ sets: <span
+class="math inline"><em>x</em> ∈ <em>P</em><em>o</em><em>s</em><em>i</em><em>t</em><em>i</em><em>v</em><em>e</em> ∩ <em>I</em><em>n</em><em>t</em><em>e</em><em>g</em><em>e</em><em>r</em></span>,
+which means <code>x</code> must be in both sets <span
+class="math inline"><em>x</em> ∈ <em>P</em><em>o</em><em>s</em><em>i</em><em>t</em><em>i</em><em>v</em><em>e</em> ∧ <em>x</em> ∈ <em>I</em><em>n</em><em>t</em><em>e</em><em>g</em><em>e</em><em>r</em></span></p>
+<p>At a higher level of abstraction, certain terms in a type conjunction
+can be interpreted like adjectives. Consider: <code>Fox * Brown</code>,
+this is the type for all foxes that are brown. When interpreted as a
+set, <code>Brown</code> would have to contain all the brown foxes, plus
+all the brown dogs, and all the brown houses, and so on. The logical
+interpretation means the test for <code>Brown</code> is true whenever
+the value is brown, which is a more obvious interpretation</p>
+<p>Type conjunctions can be used to refine types in a composable way
+without having to make new type definitions. For instance in
+<code>Integer * Positive</code>, the type <code>Positive</code> refines
+<code>Integer</code>. We could define a new type
+<code>PositiveInteger</code>, which refines and subtypes
+<code>Integer</code>. But now say we also wanted to also add a type
+definition <code>PositiveRealNumber</code> equivalent to
+<code>RealNumber * Positive</code>: we would have to copy the
+contribution of <code>Positive</code> from our
+<code>PositiveInteger</code> and paste it in
+<code>PositiveRealNumber</code> because the contribution would be the
+same. Instead, we can equivalently express these two definitions as
+<code>Integer * Positive</code> and
+<code>RealNumber * Positive</code></p>
+<p>Theoretically, we could use type conjunctions for composing
+interfaces. Consider this pseudocode:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> Fooable { <span class="kw">void</span> <span class="fu">foo</span>(<span class="dt">x</span><span class="op">:</span> X)<span class="op">;</span> }</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> Gooable { <span class="kw">void</span> <span class="fu">goo</span>(<span class="dt">x</span><span class="op">:</span> X)<span class="op">;</span> }</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> FooableAndGooable <span class="kw">extends</span> Fooable<span class="op">,</span> Gooable { }</span></code></pre></div>
+<p>The last definition, which is <em>entirely nominal</em>, can be
+expressed equivalently with <code>Fooable * Gooable</code>, but this
+type expression can be used without a definition</p>
+<p>Similarly, all composite types can be expressed as type
+conjunctions whose terms are composite types with only one member:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Vector2D {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">x</span><span class="op">:</span> RealNumber <span class="op">*</span> XDimension</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">y</span><span class="op">:</span> RealNumber <span class="op">*</span> YDimension</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Vector3D {</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">x</span><span class="op">:</span> RealNumber <span class="op">*</span> XDimension</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">y</span><span class="op">:</span> RealNumber <span class="op">*</span> YDimension</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">z</span><span class="op">:</span> RealNumber <span class="op">*</span> ZDimension</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">// equivalent to:</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> XRealDim { <span class="dt">x</span><span class="op">:</span> RealNumber <span class="op">*</span> XDimension }</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> YRealDim { <span class="dt">y</span><span class="op">:</span> RealNumber <span class="op">*</span> YDimension }</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ZRealDim { <span class="dt">Z</span><span class="op">:</span> RealNumber <span class="op">*</span> ZDimension }</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>Vector2D <span class="op">=</span> XRealDim <span class="op">*</span> YRealDim</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>Vector3D <span class="op">=</span> XRealDim <span class="op">*</span> YRealDim <span class="op">*</span> ZRealDim</span></code></pre></div>
+<p>Where the <code>XDimension</code>, etc are tag types (see below).
+Notice that the <code>XRealDim</code>, <code>YRealDim</code>, and
+<code>ZRealDim</code> definitions are essentially nominal as well. One
+of my original goals for developing the idea of type conjunctions and
+tag types was determining if something analogous to <a
+href="https://en.wikipedia.org/wiki/Tacit_programming">tacit
+programming</a> for types is possible. Since the <code>XRealDim</code>,
+etc are distinguished by their <code>XDimension</code> tag types, a
+composite vector type might be expressed like:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>Vector2D <span class="op">=</span> {RealNumber <span class="op">*</span> XDimension} <span class="op">*</span> {RealNumber <span class="op">*</span> YDimension}</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">// and you could then create a value of this type:</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> v<span class="op">:</span> Vector2D</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>v[XDimension] <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>v[YDimension] <span class="op">=</span> <span class="dv">15</span></span></code></pre></div>
+<p>Of course, the <code>XDimension</code>, etc tag types are equivalent
+to names like <code>x</code>, <code>y</code>, etc as distinguishers, but
+since <code>XDimension</code> is a type and can have definitions, the
+system is aware of it and can reason about it to some degree, whereas it
+can’t with a name like <code>x</code></p>
+<p>Along these lines, consider a variable name like
+<code>truncatedBufferLength</code>. This name means nothing to a
+compiler, but to a human programmer they can sort of understand what its
+for: its the length of a buffer that’s been truncated, or there is a
+buffer and that buffer has been truncated to this length, or something.
+We ideally want to reproduce the mental model we have of the program inside the program’s code so it can be validated and analyzed
+more fully by the compiler, but if we’re modeling elements of a program to some degree via their names,
+then the compiler won’t be aware of that model</p>
+<p>Now consider a variable like
+<code>x: Integer * Positive * LengthOf(Buffer) * For(truncatedBuffer)</code>.
+It conveys the same meaning to the programmer as the
+<code>truncatedBufferLength</code> above, but is presumably
+comprehensible by the compiler. This is pseudocode and likely not of a
+consistent form, but it hopefully conveys the idea: type conjunctions
+are equivalent to nominal definitions, and might allow programmers to
+more fully model their program in a compiler-aware way without the
+chilling effect and pollution of those nominal definitions</p>
+<h1 id="tag-typing">Tag types</h1>
+<p>A tag type (especially in a type conjunction) is a type without a
+definition. These are solely to help the compiler distinguish between alternates, and
+to aid the programmer as a form of metadata</p>
+<p>Consider this code:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">foo</span>(x<span class="op">:</span> Integer) { <span class="fu">print</span>(<span class="st">&#39;A&#39;</span>) }</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">foo</span>(x<span class="op">:</span> Integer <span class="op">*</span> MyTagType) { <span class="fu">print</span>(<span class="st">&#39;B&#39;</span>) }</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> a<span class="op">:</span> Integer <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">foo</span>(a) <span class="co">// prints A</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> b<span class="op">:</span> Integer <span class="op">*</span> MyTagType <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">foo</span>(b) <span class="co">// prints B</span></span></code></pre></div>
+<p>This necessitates the dispatcher chooses the most exclusive
+conjunctions first (see limitations below) by testing whether one type
+conjunction is a subset of another type conjunction by comparing their
+terms. This is possible even when they both include tag types, but to
+make that work meaningfully you have to assume its true that
+<code>A * B</code> is a proper subset of <code>A</code> when
+<code>B</code> is a tag type. That isn’t necessarily universally true in
+reality though, for example consider <code>Integer * RealNumber</code>.
+Even if <code>RealNumber</code> is a tag type (it has no definition),
+presumably <code>Integer</code> is a subset of <code>RealNumber</code>,
+so <code>Integer * RealNumber == Integer</code> and
+<code>Integer * RealNumber</code> isn’t a proper subset of
+<code>Integer</code></p>
+<p>But tag types in type conjunctions, when treated solely as a method
+for choosing which alternates to use, are apparently very powerful. In
+some sense, tag types are a way to automatically choose function names.
+Consider: when <code>B</code> is a tag type,
+<code>function foo(x: A * B)</code> is equivalent to
+<code>function foo_B(x: A)</code> because there is otherwise no defined
+test for which <code>x</code> values <code>foo_B</code> can take that
+distinguishes between a <code>x: A * B</code> and <code>x: A</code></p>
+<p>Tag types can also work on their own, and don’t have to be included
+in type conjunctions. For instance, a function
+<code>function foo(x: MyVariable)</code> to only be used on a particular
+variable whose type is also the sole tag type
+<code>MyVariable</code></p>
+<h1 id="limitations-of-this-translator">Limitations of this
+translator</h1>
+<p>Its undefined behavior for one function overload to be a superset of
+another function overload. So all the overloads have to be disjoint</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">foo</span>(x<span class="op">:</span> A) { <span class="op">...</span> }</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">foo</span>(x<span class="op">:</span> A <span class="op">*</span> B) { <span class="op">...</span> }</span></code></pre></div>
+<p>This isn’t allowed because <code>A</code> is a superset of
+<code>A * B</code>. The reason for this is the order guard tests are
+applied in isn’t defined, so if two tests <code>A</code> and
+<code>A * B</code> would pass for a particular value, then which is
+actually applied is undefined</p>
+<div class="center-divider">~~~</div>
+<p>All functions are mangled and have a dispatcher added, even when it
+doesn’t make any sense (eg: when the function isn’t overloaded, and has
+no parameters). The reason for this is because I’m lazy</p>
+<div class="center-divider">~~~</div>
+<p>It uses regex to find forms like <code>guard someGuard(xyz)</code>
+and <code>function foo(x, ...)</code>, and edge cases that match these
+regexs but shouldn’t (or should match but don't) are probably very likely</p>
+<div class="center-divider">~~~</div>
+<p>Parameterized types aren’t supported. A theoretical example of a
+conjunction type including a parameterized type is:
+<code>Integer * GreaterThan(5)</code>. It would probably be very
+difficult to modify the current system to accomodate this</p>
+<div class="center-divider">~~~</div>
+<p>Dispatcher functions are added only at the top level, and only for
+functions using the form <code>function NAME(PARAMETERS)</code>, so
+nested functions aren’t supported, and anonymous functions aren’t
+supported. Classes are also not supported in any way</p>
+<div class="center-divider">~~~</div>
+<p>Probably many other limitations as well</p>
+<h1 id="future-work">Future work</h1>
+<p>This program could be made significantly less brittle by: taking an
+already-written grammar for a parser generator (eg: ANTLR, treesitter,
+etc), modifying the grammar to recognize <code>guard</code> statements,
+write a transformation function to turn the parse tree into an
+equivalent vanilla javascript parse tree, and deparse the tree. This is
+probably a lot of work, though, and for not much better a result</p>
+<div class="center-divider">~~~</div>
+<p>Ideally, for a dynamic language like javascript, the dispatcher
+functions’ behaviors would be a part of the runtime, so the extra
+dispatcher functions would be unnecessary, and perhaps even name
+mangling would be unnecessary. Of course, statically typed languages
+could do static dispatching when possible. Note though that using only
+static dispatching eliminates a very broad category of dispatching
+that’s only possible at runtime</p>
+<div class="center-divider">~~~</div>
+<p>I hope that at least one statically-typed language’s developers
+implement a version of conjunctive typing with tag types into their
+language. Hell, maybe I’m an idiot and someone already has. I run into
+so many cases on an almost daily basis where I want conjunctive typing
+and/or tag typing, that I have to imagine it would be that useful for
+many people and so nobody has properly implemented it yet</p>
+<div class="center-divider">~~~</div>
+<p>My original plan was to implement conjunctive typing into a language
+with static typing then integrate an Automatic Function Composer (AFC)
+into it. The AFC I was envisioning searches through function signatures,
+solving for a new function composition whose signature matches a given
+unrecognized signature. This essentially necessitated
+conjunctive typing (which I used to call set typing) because you need
+some way to add more information about registered functions’ parameters
+without writing a bunch of new definitions (which potentiallys defeats the
+purpose of the AFC). Incidentally, you can also use function conjunction
+types to add information about functions (eg: <code>foo</code> is a member of
+<code>DoesX * DoesntThrow * ...</code>). Anyway, I wrote an AFC directed
+hypergraph-based solver (see <a
+href="https://github.com/jmacc93/AutomaticFunctionComposition">here</a>),
+but it turned out to be really hard to use the type conjunctions to
+guide the AFC, at least in its current language-nonattached form, and
+its really hard to distinguish good solutions from useless ones. In the near future, I will
+likely make an effort to solve the AFC’s solution order problem and
+integrate it into a language to really determine if its practical and useful to
+use</p>
+<div class="center-divider">~~~</div>
+<p>Constant parameters make a sort of sense in predicate-based logical
+typing:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">foo</span>(x<span class="op">:</span> <span class="dv">5</span>) { <span class="fu">print</span>(<span class="st">&#39;A&#39;</span>) }</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">foo</span>(x<span class="op">:</span> <span class="dv">10</span>) { <span class="fu">print</span>(<span class="st">&#39;B&#39;</span>) }</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">foo</span>(<span class="dv">5</span>) <span class="co">// prints A</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">foo</span>(<span class="dv">10</span>) <span class="co">// prints B</span></span></code></pre></div>
+<p>Where the guard test would be like
+<code>valueToTest == theConstant</code>, and could be probably more or
+less easily added to this system</p>
+<div class="center-divider">~~~</div>
+<p>Since guard tests are type invariants, typed
+variables’ values can be checked for proper form by the runtime using their types' guard tests. Consider the following
+code:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> x<span class="op">:</span> Positive <span class="op">*</span> Integer <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">-=</span> <span class="dv">10</span> <span class="co">// runtime should throw an error</span></span></code></pre></div>
+    </div>
+  </body>
+
+</html>
